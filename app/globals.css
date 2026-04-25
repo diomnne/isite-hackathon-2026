@@ -1,26 +1,311 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Dark Fantasy RPG Theme - Diablo/Elden Ring inspired */
+  /* Deep obsidian background with gold accents */
+  --background: #0a0a0a;
+  --foreground: #e8e4d9;
+  --card: #121212;
+  --card-foreground: #e8e4d9;
+  --popover: #121212;
+  --popover-foreground: #e8e4d9;
+  --primary: #ffd700;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #c4b998;
+  --muted: #1f1f1f;
+  --muted-foreground: #8a8473;
+  --accent: #b8860b;
+  --accent-foreground: #0a0a0a;
+  --destructive: #8b0000;
+  --destructive-foreground: #e8e4d9;
+  --border: #2a2520;
+  --input: #1a1815;
+  --ring: #ffd700;
+  --chart-1: #ffd700;
+  --chart-2: #b8860b;
+  --chart-3: #cd853f;
+  --chart-4: #8b4513;
+  --chart-5: #d4af37;
+  --radius: 0.5rem;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #e8e4d9;
+  --sidebar-primary: #ffd700;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #e8e4d9;
+  --sidebar-border: #2a2520;
+  --sidebar-ring: #ffd700;
+  
+  /* Custom RPG tokens */
+  --gold: #ffd700;
+  --gold-dim: #b8860b;
+  --gold-glow: rgba(255, 215, 0, 0.3);
+  --parchment: #d4c4a8;
+  --parchment-dark: #c4b498;
+  --parchment-bg: #1a1815;
+  --health: #8b0000;
+  --health-glow: rgba(139, 0, 0, 0.4);
+  --success: #228b22;
+  --success-glow: rgba(34, 139, 34, 0.3);
+  --stone: #3d3d3d;
+  --stone-light: #4a4a4a;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #e8e4d9;
+  --card: #121212;
+  --card-foreground: #e8e4d9;
+  --popover: #121212;
+  --popover-foreground: #e8e4d9;
+  --primary: #ffd700;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #c4b998;
+  --muted: #1f1f1f;
+  --muted-foreground: #8a8473;
+  --accent: #b8860b;
+  --accent-foreground: #0a0a0a;
+  --destructive: #8b0000;
+  --destructive-foreground: #e8e4d9;
+  --border: #2a2520;
+  --input: #1a1815;
+  --ring: #ffd700;
+  --sidebar: #0d0d0d;
 }
 
 @theme inline {
+  --font-sans: 'Geist', 'Geist Fallback', system-ui, sans-serif;
+  --font-serif: 'Cinzel', 'Times New Roman', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
+  --color-parchment: var(--parchment);
+  --color-parchment-dark: var(--parchment-dark);
+  --color-health: var(--health);
+  --color-success: var(--success);
+  --color-stone: var(--stone);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(ellipse at top, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(139, 69, 19, 0.03) 0%, transparent 50%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom RPG animations */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 15px var(--gold-glow), 0 0 30px var(--gold-glow); 
+    opacity: 0.8;
+  }
+  50% { 
+    box-shadow: 0 0 25px var(--gold-glow), 0 0 50px var(--gold-glow); 
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes xp-float {
+  0% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-60px) scale(1.2); 
+  }
+}
+
+@keyframes health-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes timer-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px var(--gold-glow);
+  }
+  50% { 
+    box-shadow: 0 0 15px var(--gold-glow), 0 0 25px var(--gold-glow);
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% { 
+    border-color: var(--gold-dim);
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.05);
+  }
+  50% { 
+    border-color: var(--gold);
+    box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.1);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-xp-float {
+  animation: xp-float 1.5s ease-out forwards;
+}
+
+.animate-health-pulse {
+  animation: health-pulse 1s ease-in-out infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* Stone tablet texture effect */
+.stone-texture {
+  background: linear-gradient(135deg, var(--stone) 0%, var(--stone-light) 50%, var(--stone) 100%);
+  border: 2px solid var(--gold-dim);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.05),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.stone-texture:hover {
+  border-color: var(--gold);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.05),
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--gold-glow);
+}
+
+/* Parchment texture effect */
+.parchment-texture {
+  background: linear-gradient(
+    to bottom,
+    var(--parchment-bg) 0%,
+    rgba(26, 24, 21, 0.95) 100%
+  );
+  border: 2px solid var(--gold-dim);
+  position: relative;
+}
+
+.parchment-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* Gold button glow effect */
+.gold-glow {
+  box-shadow: 0 0 15px var(--gold-glow);
+  transition: box-shadow 0.3s ease;
+}
+
+.gold-glow:hover {
+  box-shadow: 0 0 25px var(--gold-glow), 0 0 40px var(--gold-glow);
+}
+
+/* Health bar styling */
+.health-bar {
+  background: linear-gradient(to right, #4a0000, var(--health), #4a0000);
+  box-shadow: 0 0 10px var(--health-glow);
+}
+
+/* Timer bar styling */
+.timer-bar {
+  background: linear-gradient(to right, var(--gold-dim), var(--gold), var(--gold-dim));
+  animation: timer-glow 2s ease-in-out infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
