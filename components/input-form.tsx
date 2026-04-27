@@ -21,12 +21,13 @@ export function InputForm() {
     e.preventDefault()
     
     if (!content.trim()) {
-      setError('Please paste some content to transform into an adventure')
+      setError('Please paste a text transcript or YouTube link to transform into an adventure')
       return
     }
 
-    if (content.trim().length < 100) {
-      setError('Content is too short. Please paste at least a paragraph of text.')
+    const isUrl = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(content.trim())
+    if (!isUrl && content.trim().length < 100) {
+      setError('Content is too short. Please paste at least a paragraph of text, or a valid YouTube link.')
       return
     }
 
@@ -82,7 +83,7 @@ export function InputForm() {
             Ancient Scroll of Knowledge
           </h2>
           <p className="text-[var(--parchment-dark)] max-w-md mx-auto">
-            Inscribe your sacred texts below to transform them into an epic learning adventure
+            Inscribe your sacred texts or paste a crystal vision (YouTube link) below to transform them into an epic learning adventure
           </p>
         </div>
 
@@ -105,13 +106,13 @@ export function InputForm() {
           <div className="space-y-2">
             <label htmlFor="content" className="text-sm font-semibold text-[var(--gold-dim)] uppercase tracking-wider flex items-center gap-2">
               <Scroll className="h-4 w-4" />
-              Sacred Text
+              Sacred Text or Crystal Vision (YouTube Link)
             </label>
             <Textarea
               id="content"
-              placeholder="Paste your lecture transcript, article, or any educational content here...
+              placeholder="Paste your lecture transcript, article, or a YouTube link here...
 
-Example: 'Cell division is a fundamental process in biology. Mitosis is the process by which a cell divides to produce two genetically identical daughter cells...'"
+Example: 'https://youtube.com/watch?v=...'"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[220px] bg-[var(--input)] border-[var(--gold-dim)]/30 text-[var(--parchment)] placeholder:text-[var(--muted-foreground)]/60 resize-none focus:border-[var(--gold)]/50 leading-relaxed"
@@ -120,9 +121,9 @@ Example: 'Cell division is a fundamental process in biology. Mitosis is the proc
               <span className="text-[var(--muted-foreground)]">
                 {content.length} characters
               </span>
-              {content.length > 0 && content.length < 100 && (
+              {content.length > 0 && content.length < 100 && !/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(content.trim()) && (
                 <span className="text-[var(--health)]">
-                  Minimum 100 characters required
+                  Minimum 100 characters required for text
                 </span>
               )}
             </div>

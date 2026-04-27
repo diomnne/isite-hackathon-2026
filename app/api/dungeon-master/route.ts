@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages, UIMessage } from 'ai'
+import { UIMessage } from 'ai'
 
 export async function POST(req: Request) {
   try {
@@ -17,41 +17,44 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Concept is required' }, { status: 400 })
     }
 
-    const systemPrompt = `You are a wise and engaging Dungeon Master guiding a learner through "${worldTitle}".
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL_DUNGEON_MASTER || 'http://localhost:5678/webhook/dungeon-master'
 
-Current Location: ${concept.location}
-Concept to Master: ${concept.name}
-Description: ${concept.description}
-Difficulty: ${concept.difficulty}
-
-YOUR ROLE:
-- Create immersive, narrative challenges that test understanding of the concept
-- Be encouraging but maintain educational rigor
-- Use the fantasy setting to make learning engaging
-- Ask follow-up questions if the learner's explanation is vague or incomplete
-- Provide hints when asked, but don't give away the answer
-- Keep responses concise (2-4 paragraphs max)
-
-FIRST MESSAGE STYLE:
-If this is the start of a challenge, create an engaging scenario where the learner must demonstrate their knowledge. For example:
-"You approach ${concept.location}. A guardian blocks your path and says: 'To pass, you must explain [specific aspect of ${concept.name}]...'"
-
-EVALUATION STYLE:
-When evaluating an answer, acknowledge what they got right, gently correct misconceptions, and ask clarifying questions if needed. Only tell them they've mastered the concept when they demonstrate true understanding.
-
-Remember: You're testing their UNDERSTANDING, not memorization. Accept valid explanations even if worded differently than expected.`
-
-    const result = streamText({
-      model: 'openai/gpt-4o-mini',
-      system: systemPrompt,
-      messages: await convertToModelMessages(messages),
+    const response = await fetch(n8nWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messages, concept, worldTitle }),
     })
 
-    return result.toUIMessageStreamResponse()
+    if (!response.ok) {
+      throw new Error(`n8n webhook failed with status: ${response.status}`)
+    }
+
+    // Assuming a blocking JSON response from n8n for simplicity,
+    // though n8n could be configured to stream SSE.
+    const data = await response.json()
+    const text = data.output || data.response || data.text || (typeof data === 'string' ? data : JSON.stringify(data))
+
+    // Format the response to be compatible with Vercel AI SDK's useChat data stream protocol
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`))
+        controller.close()
+      }
+    })
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'x-vercel-ai-data-stream': 'v1'
+      }
+    })
   } catch (error) {
     console.error('Dungeon Master error:', error)
     return Response.json(
-      { error: 'Failed to get response from Dungeon Master' },
+      { error: 'Failed to get response from Dungeon Master via n8n' },
       { status: 500 }
     )
   }
