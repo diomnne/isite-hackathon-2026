@@ -101,9 +101,6 @@ function AdventureContent() {
                   <Scroll className="h-6 w-6 text-[var(--gold)]" />
                 </div>
                 <div>
-                  <h1 className="font-serif text-xl sm:text-2xl font-bold text-[var(--gold)]">
-                    {worldMap.title}
-                  </h1>
                   <div className="flex items-center gap-2 text-sm text-[var(--parchment-dark)]">
                     {allCompleted ? (
                       <>
@@ -153,6 +150,7 @@ function AdventureContent() {
           </div>
         )}
         <WorldMap
+          title={worldMap.title}
           concepts={worldMap.concepts}
           onSelectConcept={setSelectedConcept}
         />

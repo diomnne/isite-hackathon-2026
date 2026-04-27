@@ -135,7 +135,7 @@ export function ConceptCard({ concept, onClick, index }: ConceptCardProps) {
           <div className="absolute inset-x-0 bottom-0 h-12 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="text-sm font-semibold text-[var(--gold)] flex items-center gap-2 drop-shadow-lg">
               <Swords className="h-4 w-4" />
-              Enter the Challenge
+              Enter {concept.location}
             </span>
           </div>
         )}

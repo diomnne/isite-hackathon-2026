@@ -19,7 +19,7 @@ export function InputForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!content.trim()) {
       setError('Please paste a text transcript or YouTube link to transform into an adventure')
       return
@@ -38,9 +38,9 @@ export function InputForm() {
       const response = await fetch('/api/generate-world', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           content: content.trim(),
-          title: title.trim() || undefined 
+          title: title.trim() || undefined
         }),
       })
 
@@ -49,7 +49,7 @@ export function InputForm() {
       }
 
       const data = await response.json()
-      
+
       const worldMap: WorldMap = {
         id: crypto.randomUUID(),
         title: data.title || title || 'Untitled Adventure',
@@ -102,7 +102,7 @@ export function InputForm() {
               className="h-12 bg-[var(--input)] border-[var(--gold-dim)]/30 text-[var(--parchment)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--gold)]/50 font-serif"
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="content" className="text-sm font-semibold text-[var(--gold-dim)] uppercase tracking-wider flex items-center gap-2">
               <Scroll className="h-4 w-4" />
@@ -135,8 +135,8 @@ Example: 'https://youtube.com/watch?v=...'"
             </div>
           )}
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full h-14 text-lg font-serif font-semibold gap-3 bg-[var(--gold)] hover:bg-[var(--gold-dim)] text-black gold-glow"
             disabled={isLoading}
           >
