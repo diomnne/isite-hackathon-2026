@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ content, title }),
+      body: JSON.stringify({ message: content, title }),
     })
 
     if (!response.ok) {

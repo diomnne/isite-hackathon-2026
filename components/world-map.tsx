@@ -5,17 +5,26 @@ import { Swords, Star, Trophy } from 'lucide-react'
 import type { Concept } from '@/lib/types'
 
 interface WorldMapProps {
+  title?: string
   concepts: Concept[]
   onSelectConcept: (concept: Concept) => void
 }
 
-export function WorldMap({ concepts, onSelectConcept }: WorldMapProps) {
+export function WorldMap({ title, concepts, onSelectConcept }: WorldMapProps) {
   const completedCount = concepts.filter(c => c.completed).length
   const totalXp = concepts.reduce((sum, c) => sum + (c.completed ? c.xpReward : 0), 0)
   const potentialXp = concepts.reduce((sum, c) => sum + c.xpReward, 0)
 
   return (
     <div className="space-y-6">
+      {/* Title equivalent to st.header */}
+      {title && (
+        <div className="mb-8 border-b border-[var(--gold-dim)]/30 pb-4">
+          <h2 className="text-4xl font-bold font-serif text-[var(--gold)] flex items-center gap-4">
+            <span className="text-5xl">🏰</span> {title}
+          </h2>
+        </div>
+      )}
       {/* Stats bar */}
       <div className="flex items-center justify-between p-5 rounded-xl stone-texture">
         <div className="flex items-center gap-8">
