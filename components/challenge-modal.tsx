@@ -67,8 +67,10 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
             description: concept.description,
             location: concept.location,
             difficulty: concept.difficulty,
+            sourceText: worldMap.sourceText,
           },
           worldTitle: worldMap.title,
+          video_url: worldMap.sourceText,
         },
       }),
     }),
@@ -98,6 +100,43 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
       sendMessage({ text: 'I approach this location and am ready to face the challenge.' })
     }
   }, [messages.length, isReady, sendMessage])
+
+  // Watch for XP awards from n8n
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.role === 'assistant' && !isStreaming) {
+      const text = getMessageText(lastMsg.parts);
+      const xpMatch = text.match(/\[XP_AWARDED:(\d+)\]\n/);
+      if (xpMatch && !evaluationResult) {
+        const xp = parseInt(xpMatch[1], 10);
+        
+        // Apply health/hint penalties to XP
+        const healthPenalty = health < 100 ? Math.floor((100 - health) / 20) * 5 : 0;
+        const finalXp = Math.max(0, xp - healthPenalty);
+        
+        setEvaluationResult({
+          passed: true,
+          feedback: text.replace(xpMatch[0], ''), // The DM's narrative becomes the feedback
+          correctPoints: ['You have proven your knowledge to the Dungeon Master!'],
+          missedPoints: [],
+          xpAwarded: finalXp,
+        });
+
+        if (finalXp > 0) {
+          setFloatXp(finalXp);
+          setShowXpFloat(true);
+          setTimeout(() => setShowXpFloat(false), 1500);
+        }
+      } else if (!xpMatch && !evaluationResult && text) {
+        // If they got it wrong, the DM gave a hint/response. We deduct health.
+        // We only do this if the response didn't just start and they actually answered.
+        if (messages.length > 2) {
+          // Deduct a tiny bit of health for a wrong answer
+          setHealth(prev => Math.max(0, prev - 5));
+        }
+      }
+    }
+  }, [messages, isStreaming, evaluationResult, health]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -286,8 +325,11 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[250px]">
             {messages.filter(m => m.role !== 'user' || getMessageText(m.parts) !== 'I approach this location and am ready to face the challenge.').map((message) => {
-              const text = getMessageText(message.parts)
+              let text = getMessageText(message.parts)
               if (!text) return null
+              
+              // Hide the XP tag from the user
+              text = text.replace(/\[XP_AWARDED:\d+\]\n/, '')
 
               return (
                 <div
