@@ -29,10 +29,22 @@ export async function POST(req: Request) {
     const responseText = await response.text()
     let result;
     try {
-      result = JSON.parse(responseText)
+      const parsed = JSON.parse(responseText)
+      // Map n8n's Ollama schema to our Next.js frontend schema
+      result = {
+        title: parsed.world_name || title,
+        concepts: (parsed.regions || []).map((r: any) => ({
+          name: r.name,
+          location: r.location,
+          description: r.description,
+          difficulty: r.difficulty || 'medium',
+          xpReward: r.xpReward || r.xp_reward || 100,
+          landmarks: r.landmarks || []
+        }))
+      }
     } catch (parseError) {
       console.error('Failed to parse n8n response as JSON. Raw response:', responseText)
-      throw new Error(`Invalid JSON from n8n. Make sure your Webhook node is set to "Using Respond to Webhook Node" and you are returning JSON. Raw response: ${responseText.substring(0, 100)}...`)
+      throw new Error(`Invalid JSON from n8n. Raw response: ${responseText.substring(0, 100)}...`)
     }
 
     return Response.json(result)

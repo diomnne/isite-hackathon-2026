@@ -2,15 +2,11 @@ import { UIMessage } from 'ai'
 
 export async function POST(req: Request) {
   try {
-    const { messages, concept, worldTitle } = await req.json() as {
+    const { messages, concept, worldTitle, video_url } = await req.json() as {
       messages: UIMessage[]
-      concept: {
-        name: string
-        description: string
-        location: string
-        difficulty: string
-      }
+      concept: any
       worldTitle: string
+      video_url: string
     }
 
     if (!concept) {
@@ -19,22 +15,45 @@ export async function POST(req: Request) {
 
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL_DUNGEON_MASTER || 'http://localhost:5678/webhook/dungeon-master'
 
+    // Get the latest user message
+    const lastUserMessage = messages.filter(m => m.role === 'user').pop() as any
+    let user_message = ''
+    if (lastUserMessage) {
+      if (lastUserMessage.content) {
+        user_message = lastUserMessage.content
+      } else if (Array.isArray(lastUserMessage.parts)) {
+        user_message = lastUserMessage.parts
+          .filter((p: any) => p.type === 'text')
+          .map((p: any) => p.text)
+          .join('')
+      }
+    }
+
     const response = await fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ messages, concept, worldTitle }),
+      // Match the exact schema expected by n8n
+      body: JSON.stringify({ 
+        video_url: video_url || concept.sourceText, 
+        user_message, 
+        user_id: 'local-session-123' 
+      }),
     })
 
     if (!response.ok) {
       throw new Error(`n8n webhook failed with status: ${response.status}`)
     }
 
-    // Assuming a blocking JSON response from n8n for simplicity,
-    // though n8n could be configured to stream SSE.
     const data = await response.json()
-    const text = data.output || data.response || data.text || (typeof data === 'string' ? data : JSON.stringify(data))
+    
+    // Extract narrative and XP from n8n response
+    let text = data.dm_narrative || data.output || data.response || data.text || (typeof data === 'string' ? data : JSON.stringify(data))
+    
+    if (data.xp_reward && data.xp_reward > 0) {
+      text = `[XP_AWARDED:${data.xp_reward}]\n${text}`
+    }
 
     // Format the response to be compatible with Vercel AI SDK's useChat data stream protocol
     const encoder = new TextEncoder()
