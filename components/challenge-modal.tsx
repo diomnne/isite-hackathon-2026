@@ -50,6 +50,7 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
   const [timeRemaining, setTimeRemaining] = useState(180) // 3 minutes
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const autoStartRef = useRef(false)
 
   const maxHints = 3
   const maxShields = 1
@@ -77,7 +78,7 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
   })
 
   const isStreaming = status === 'streaming'
-  const isReady = status === 'ready'
+  const isReady = status === 'ready' || !status
 
   // Timer countdown
   useEffect(() => {
@@ -96,10 +97,11 @@ export function ChallengeModal({ concept, worldMap, onClose, onComplete }: Chall
 
   // Auto-start the challenge
   useEffect(() => {
-    if (messages.length === 0 && isReady) {
+    if (messages.length === 0 && !autoStartRef.current) {
+      autoStartRef.current = true
       sendMessage({ text: 'I approach this location and am ready to face the challenge.' })
     }
-  }, [messages.length, isReady, sendMessage])
+  }, [messages.length, sendMessage])
 
   // Watch for XP awards from n8n
   useEffect(() => {
